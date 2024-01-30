@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>User Information from form:</h1>
+    <div id="form-info"></div>
+
+    <button class="theme-btn">Toggle theme</button>
+  </body>
+
+  <script>
+    const formInfo = new URLSearchParams(location.search)
+
+    const ulElement = document.createElement('ul')
+
+    for (const [key, value] of formInfo) {
+      const liElement = document.createElement('li')
+      liElement.textContent = `${
+        key[0].toLocaleUpperCase() + key.slice(1)
+      }: ${value}`
+      ulElement.appendChild(liElement)
+    }
+
+    document.querySelector('#form-info').appendChild(ulElement)
+
+    console.log({ formInfo })
+  </script>
+
+  <script src="/script.js"></script>
+</html>
