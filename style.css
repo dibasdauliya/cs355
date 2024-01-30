@@ -1,11 +1,13 @@
 :root {
   --bg-color: #f5f5f5;
   --text-color: #333;
+  --link-color: #200676;
 }
 
 :root[dark-mode] {
   --bg-color: #333;
   --text-color: #f5f5f5;
+  --link-color: #5627f0;
 }
 
 body {
@@ -15,7 +17,7 @@ body {
 }
 
 a {
-  color: var(--text-color);
+  color: var(--link-color);
 }
 
 .styled-div {
