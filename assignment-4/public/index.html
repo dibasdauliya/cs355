@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dog Pictures from Local API</title>
+
+    <link rel="stylesheet" href="./dog-style.css" />
+  </head>
+  <body>
+    <h1 class="center my-4">Dog Pictures from Local API</h1>
+    <section class="top-section center">
+      <div>
+        <label for="breed">Type any dog breed:</label>
+        <input
+          list="breeds"
+          name="breed"
+          id="breed"
+          placeholder="boston bulldog" />
+        <datalist id="breeds"> </datalist>
+      </div>
+
+      <button id="show-images">Show Images</button>
+    </section>
+
+    <main id="img-container">
+      <p id="img-err-text" class="center hide">No such breed</p>
+      <img
+        id="dog-img"
+        alt="boston bulldog"
+        src="https://images.dog.ceo/breeds/bulldog-boston/n02096585_32.jpg" />
+    </main>
+    <p id="img-time-log" class="center">
+      Image changing in <span id="img-change-seconds">5 seconds</span>
+    </p>
+
+    <script src="./dog-script.js"></script>
+  </body>
+</html>
