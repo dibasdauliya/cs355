@@ -52,7 +52,7 @@ app.get('/image/:breed', (req, res) => {
           `${breed}/${getRandomItemFromArray(images[breed])}`
       })
   } else {
-    res.status(400).send({ message: 'Breed not found', status: 'error' })
+    res.status(404).send({ message: 'Breed not found', status: 'error' })
   }
 })
 
@@ -70,7 +70,7 @@ app.get('/image/:breed/:type', (req, res) => {
           `${breed}-${type}/${getRandomItemFromArray(images[breed][type])}`
       })
   } else {
-    res.status(400).send({ message: 'Breed not found', status: 'error' })
+    res.status(404).send({ message: 'Breed not found', status: 'error' })
   }
 })
 
