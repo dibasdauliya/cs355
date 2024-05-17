@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form method="post">
+      <h1>Register</h1>
+      <div>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" required />
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" required />
+      </div>
+
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required />
+      </div>
+      <div>
+        <label for="confirm_password">Confirm Password</label>
+        <input
+          type="password"
+          name="confirm_password"
+          id="confirm_password"
+          required />
+      </div>
+
+      <p id="error">&nbsp;</p>
+
+      <button type="submit">Register</button>
+
+      <p>Already have an account? <a href="index.html">Log In</a></p>
+    </form>
+
+    <script>
+      const form = document.querySelector('form'),
+        error = document.getElementById('error')
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const formData = new FormData(form)
+        const data = Object.fromEntries(formData)
+
+        if (data.password !== data.confirm_password) {
+          error.innerText = 'Passwords do not match'
+          return
+        }
+
+        fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            localStorage.setItem('authToken', data.authToken)
+            localStorage.setItem('username', data.username)
+            localStorage.setItem('email', data.email)
+
+            window.location.href = 'profile.html'
+          })
+          .catch((error) => {
+            console.error('Error:', error)
+          })
+      })
+    </script>
+  </body>
+</html>

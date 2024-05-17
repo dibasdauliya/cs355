@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <section>
+      <div class="box">
+        <h1>Profile</h1>
+        <p>Username: <input type="text" id="username" /></p>
+        <p>Email: <input type="email" id="email" /></p>
+
+        <button id="update">Update</button>
+        <hr />
+        <button id="delete" style="margin-bottom: 4px">Delete Account</button>
+        <button id="logout">Log Out</button>
+      </div>
+
+      <div>
+        <a href="dashboard.html">Go to Dashboard</a>
+      </div>
+
+      <div class="box">
+        <h3>Other Users</h3>
+
+        <ul id="users"></ul>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        getUsers()
+      })
+
+      function getUsers() {
+        fetch('/users')
+          .then((response) => response.json())
+          .then((data) => {
+            console.log({ data })
+            const usersList = document.getElementById('users')
+            usersList.innerHTML = ''
+            Object.values(data).forEach((user) => {
+              const li = document.createElement('li')
+              li.innerText = user.username
+              usersList.appendChild(li)
+            })
+          })
+      }
+
+      const username = localStorage.getItem('username')
+      const email = localStorage.getItem('email')
+
+      document.getElementById('username').value = username
+      document.getElementById('email').value = email
+
+      const logoutButton = document.getElementById('logout')
+      logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('username')
+        localStorage.removeItem('email')
+        window.location.href = 'index.html'
+      })
+
+      const deleteButton = document.getElementById('delete')
+      deleteButton.addEventListener('click', () => {
+        fetch(`/user/${username}/${localStorage.getItem('authToken')}`, {
+          method: 'DELETE'
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              alert(data.error)
+            } else {
+              localStorage.removeItem('authToken')
+              localStorage.removeItem('username')
+              localStorage.removeItem('email')
+              window.location.href = 'index.html'
+            }
+          })
+      })
+
+      const updateButton = document.getElementById('update')
+      updateButton.addEventListener('click', () => {
+        const newUsername = document.getElementById('username').value
+        const newEmail = document.getElementById('email').value
+
+        console.log({ newUsername, newEmail })
+        console.log(username)
+
+        fetch(`/user/${username}/${localStorage.getItem('authToken')}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ newUsername, newEmail })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              alert(data.error)
+            } else {
+              localStorage.setItem('username', newUsername)
+              localStorage.setItem('email', newEmail)
+              alert('Profile updated successfully')
+              getUsers()
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error)
+          })
+      })
+    </script>
+  </body>
+</html>

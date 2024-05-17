@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Post in a Community</h1>
+
+      <form>
+        <div>
+          <label for="title">Title</label>
+          <input type="text" name="title" id="title" required />
+        </div>
+
+        <div>
+          <label for="content">Content</label>
+          <textarea name="content" id="content" rows="4" required></textarea>
+        </div>
+
+        <button type="submit">Post</button>
+      </form>
+    </main>
+
+    <h2>Posts</h2>
+    <section id="posts"></section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        getPosts()
+      })
+
+      function likePost(event, postId) {
+        event.preventDefault()
+        fetch(`/like/${postId}`, {
+          method: 'PATCH'
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            getPosts()
+            localStorage.setItem('likedPostID', postId)
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      }
+
+      function editPost(title, content, postId) {
+        document.getElementById('title').value = title
+        document.getElementById('content').value = content
+        document.querySelector('button[type="submit"]').innerText = 'Update'
+
+        localStorage.setItem('updatePostId', postId)
+        scrollTo(0, 0)
+      }
+
+      function deletePost(postId) {
+        fetch(`/post/${postId}`, {
+          method: 'DELETE'
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            getPosts()
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      }
+
+      function getPosts() {
+        fetch('/posts')
+          .then((response) => response.json())
+          .then((data) => {
+            console.log({ data })
+            const postsSection = document.getElementById('posts')
+            postsSection.innerHTML = ''
+            Object.values(data).length === 0
+              ? (postsSection.innerHTML = '<p>No posts available</p>')
+              : Object.values(data).forEach((post) => {
+                  const div = document.createElement('div')
+                  div.classList.add('box')
+                  div.innerHTML = `
+                    <h3>${post.title}</h3>
+                    <p>${post.content}</p>
+                    <p>By: ${post.username}</p>
+                    <p>Likes: ${post.likes}</p>
+                    <small>Created at ${new Date(
+                      post.createdAt
+                    ).toLocaleString()}</small>
+
+                    <p class="flex">
+                        
+                      <button
+                       onclick="likePost(event,'${post._id}')">
+                      Like
+                      </button>
+                      ${
+                        post.username === localStorage.getItem('username')
+                          ? `
+                          <button onclick="editPost('${post.title}','${post.content}','${post._id}')">Edit</button>
+                        <button onclick="deletePost('${post._id}')">Delete</button>`
+                          : ''
+                      }
+                        </p>
+                `
+                  postsSection.appendChild(div)
+                })
+          })
+      }
+
+      const form = document.querySelector('form')
+      form.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        const formData = new FormData(form)
+        const title = formData.get('title')
+        const content = formData.get('content')
+        const postID = localStorage.getItem('updatePostId')
+        // get button text
+        const isUpdate =
+          document
+            .querySelector('button[type="submit"]')
+            .innerText.toLowerCase() == 'update'
+            ? true
+            : false
+
+        fetch(
+          `/post/${localStorage.getItem('username')}/${localStorage.getItem(
+            'authToken'
+          )}`,
+          {
+            method: isUpdate ? 'PATCH' : 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: isUpdate
+              ? JSON.stringify({ title, content, postID })
+              : JSON.stringify({ title, content })
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            getPosts()
+
+            document.getElementById('title').value = ''
+            document.getElementById('content').value = ''
+            document.querySelector('button[type="submit"]').innerText = 'Post'
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      })
+    </script>
+  </body>
+</html>
